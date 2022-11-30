@@ -1,0 +1,20 @@
+SHW@SHW:/tmp# cd /lib/modules/<new_kernel>
+SHW@SHW:/tmp# find . -name *.ko -exec strip --strip-unneeded {} +
+This will drastically reduce the size. After executing above command, you can proceed to create initramfs/initrd
+
+
+Download the sources from www.kernel.org and uncompress it.
+
+Copy your previous .config to the sources and do a make menuconfig to watch for the new options and modify the configuration according to the new policy of the kernel.
+
+Then, compile it:
+
+$> make -j 4
+Finally, install it:
+
+$> su -c 'make INSTALL_MOD_STRIP=1 modules_install && make install'
+After a few tests, remove the old kernel from /boot and /lib/modules directories.
+
+The INSTALL_MOD_STRIP when set to 1 add a strip --strip-debug when installing the module, which is enough to reduce the size drastically.
+
+See: INSTALL_MOD_STRIP in Documentation/kbuild/kbuild.txt.

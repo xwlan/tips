@@ -1,0 +1,1097 @@
+root@debian:~# bpftrace -l 'kprobe:kvm_vcpu*'
+kprobe:kvm_vcpu_mmap
+kprobe:kvm_vcpu_destroy
+kprobe:kvm_vcpu_fault
+kprobe:kvm_vcpu_wake_up
+kprobe:kvm_vcpu_ioctl
+kprobe:kvm_vcpu_compat_ioctl
+kprobe:kvm_vcpu_yield_to
+kprobe:kvm_vcpu_check_block
+kprobe:kvm_vcpu_block
+kprobe:kvm_vcpu_kick
+kprobe:kvm_vcpu_read_guest
+kprobe:kvm_vcpu_write_guest
+kprobe:kvm_vcpu_map
+kprobe:kvm_vcpu_release
+kprobe:kvm_vcpu_gfn_to_memslot
+kprobe:kvm_vcpu_is_visible_gfn
+kprobe:kvm_vcpu_gfn_to_hva
+kprobe:kvm_vcpu_gfn_to_pfn_atomic
+kprobe:kvm_vcpu_gfn_to_pfn
+kprobe:kvm_vcpu_write_guest_page
+kprobe:kvm_vcpu_mark_page_dirty
+kprobe:kvm_vcpu_read_guest_page
+kprobe:kvm_vcpu_read_guest_atomic
+kprobe:kvm_vcpu_unmap
+kprobe:kvm_vcpu_gfn_to_page
+kprobe:kvm_vcpu_gfn_to_hva_prot
+kprobe:kvm_vcpu_on_spin
+kprobe:kvm_vcpu_exit_request
+kprobe:kvm_vcpu_is_reset_bsp
+kprobe:kvm_vcpu_halt
+kprobe:kvm_vcpu_update_apicv
+kprobe:kvm_vcpu_ready_for_interrupt_injection
+kprobe:kvm_vcpu_ioctl_x86_get_vcpu_events
+kprobe:kvm_vcpu_do_singlestep
+kprobe:kvm_vcpu_ioctl_x86_set_vcpu_events
+kprobe:kvm_vcpu_reload_apic_access_page
+kprobe:kvm_vcpu_reset
+kprobe:kvm_vcpu_deliver_sipi_vector
+kprobe:kvm_vcpu_is_bsp
+kprobe:kvm_vcpu_after_set_cpuid
+kprobe:kvm_vcpu_ioctl_set_cpuid
+kprobe:kvm_vcpu_ioctl_set_cpuid2
+kprobe:kvm_vcpu_ioctl_get_cpuid2
+kprobe:kvm_vcpu_mtrr_init
+kprobe:kvm_vcpu_ioctl_get_hv_cpuid
+root@debian:~# bpftrace -l 'kprobe:kvm_vcpu*' | grep
+Usage: grep [OPTION]... PATTERNS [FILE]...
+Try 'grep --help' for more information.
+root@debian:~# bpftrace -l 'kprobe:kvm_vcpu*' | wc -l
+45
+root@debian:~# bpftrace -e 'kprobe:kvm_vcpu* { @[kstack()]=count();}'
+Attaching 45 probes...
+^C
+
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    ata_sff_pio_task+154
+    process_one_work+438
+    worker_thread+83
+    kthread+283
+    ret_from_fork+31
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    skip_emulated_instruction+105
+    kvm_skip_emulated_instruction+40
+    kvm_fast_pio+107
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    __ftrace_hash_rec_update.part.0+239
+    ftrace_hash_rec_update_modify+25
+    ftrace_hash_move_and_update_ops+196
+    ftrace_set_hash+288
+    ftrace_set_filter_ip+42
+    arm_kprobe+159
+    enable_kprobe+204
+    enable_trace_kprobe+139
+    perf_trace_event_init+385
+    perf_kprobe_init+176
+    perf_kprobe_event_init+58
+    perf_try_init_event+69
+    perf_event_alloc+1488
+    __do_sys_perf_event_open+461
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    apic_has_interrupt_for_ppr+0
+    kvm_apic_has_interrupt+68
+    kvm_cpu_has_interrupt+95
+    kvm_arch_vcpu_runnable+340
+    kvm_arch_vcpu_ioctl_run+1664
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    mutex_lock+5
+    psi_avgs_work+46
+    process_one_work+438
+    worker_thread+83
+    kthread+283
+    ret_from_fork+31
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    skip_emulated_instruction+105
+    kvm_skip_emulated_instruction+40
+    kvm_emulate_halt+14
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    sysvec_apic_timer_interrupt+49
+    asm_sysvec_apic_timer_interrupt+18
+    _raw_spin_unlock_irqrestore+17
+    rcu_core+1059
+    __softirqentry_text_start+197
+    asm_call_sysvec_on_stack+15
+    do_softirq_own_stack+55
+    irq_exit_rcu+142
+    sysvec_apic_timer_interrupt+54
+    asm_sysvec_apic_timer_interrupt+18
+    native_safe_halt+14
+    acpi_idle_do_entry+70
+    acpi_idle_enter+134
+    cpuidle_enter_state+137
+    cpuidle_enter+41
+    do_idle+495
+    cpu_startup_entry+25
+    start_kernel+1415
+    secondary_startup_64_no_verify+176
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    native_write_msr+6
+    x2apic_send_IPI+73
+    generic_exec_single+104
+    smp_call_function_single+214
+    event_function_call+343
+    perf_event_for_each_child+52
+    _perf_ioctl+677
+    perf_ioctl+61
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    vmx_vcpu_load_vmcs+154
+    vmx_vcpu_load+19
+    kvm_arch_vcpu_load+90
+    finish_task_switch+236
+    __schedule+650
+    schedule+70
+    kvm_vcpu_block+88
+    kvm_arch_vcpu_ioctl_run+1733
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    vmx_set_interrupt_shadow+24
+    skip_emulated_instruction+171
+    kvm_skip_emulated_instruction+40
+    complete_fast_pio_in+117
+    kvm_arch_vcpu_ioctl_run+5383
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    vmx_get_rflags+0
+    kvm_skip_emulated_instruction+22
+    kvm_emulate_halt+14
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    do_idle+0
+    cpu_startup_entry+25
+    secondary_startup_64_no_verify+176
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    tick_nohz_idle_enter+67
+    do_idle+59
+    cpu_startup_entry+25
+    secondary_startup_64_no_verify+176
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    skip_emulated_instruction+105
+    kvm_skip_emulated_instruction+40
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    __fget_files+75
+    __fget_light+46
+    __fdget_pos+19
+    ksys_write+42
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    smp_call_function_single+227
+    on_each_cpu+43
+    __purge_vmap_area_lazy+93
+    _vm_unmap_aliases.part.0+269
+    __vunmap+348
+    bpf_jit_free+90
+    process_one_work+438
+    worker_thread+83
+    kthread+283
+    ret_from_fork+31
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    vmx_set_interrupt_shadow+24
+    skip_emulated_instruction+171
+    kvm_skip_emulated_instruction+40
+    kvm_fast_pio+107
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    _raw_spin_unlock_irqrestore+17
+    vmci_send_datagram+113
+    vmci_datagram_dispatch+128
+    __vmci_transport_send_control_pkt+140
+    vmci_transport_send_control_pkt+159
+    vmci_transport_send_wrote+31
+    vmci_transport_notify_pkt_send_post_enqueue+88
+    vsock_stream_sendmsg+785
+    sock_sendmsg+94
+    __sys_sendto+238
+    __x64_sys_sendto+37
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    vmx_cache_reg+384
+    skip_emulated_instruction+85
+    kvm_skip_emulated_instruction+40
+    kvm_emulate_halt+14
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    vmx_interrupt_blocked+77
+    vmx_interrupt_allowed+49
+    kvm_arch_vcpu_runnable+239
+    kvm_vcpu_check_block+37
+    kvm_vcpu_block+129
+    kvm_arch_vcpu_ioctl_run+1733
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    _raw_spin_unlock_irqrestore+17
+    poll_freewait+61
+    do_sys_poll+1181
+    __x64_sys_ppoll+188
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    process_one_work+421
+    worker_thread+83
+    kthread+283
+    ret_from_fork+31
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    vmx_set_rflags+62
+    x86_emulate_instruction+977
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    smp_call_function_single+227
+    vmx_vcpu_load_vmcs+485
+    vmx_vcpu_load+19
+    kvm_arch_vcpu_load+90
+    finish_task_switch+236
+    __schedule+650
+    schedule+70
+    kvm_vcpu_block+88
+    kvm_arch_vcpu_ioctl_run+1733
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    sysvec_apic_timer_interrupt+49
+    asm_sysvec_apic_timer_interrupt+18
+    _raw_spin_unlock_irqrestore+17
+    uhci_hub_status_data+101
+    usb_hcd_poll_rh_status+90
+    call_timer_fn+41
+    __run_timers.part.0+467
+    run_timer_softirq+38
+    __softirqentry_text_start+197
+    asm_call_sysvec_on_stack+15
+    do_softirq_own_stack+55
+    irq_exit_rcu+142
+    sysvec_apic_timer_interrupt+54
+    asm_sysvec_apic_timer_interrupt+18
+    native_safe_halt+14
+    acpi_idle_do_entry+70
+    acpi_idle_enter+134
+    cpuidle_enter_state+137
+    cpuidle_enter+41
+    do_idle+495
+    cpu_startup_entry+25
+    secondary_startup_64_no_verify+176
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    sysvec_apic_timer_interrupt+49
+    asm_sysvec_apic_timer_interrupt+18
+    __softirqentry_text_start+111
+    asm_call_sysvec_on_stack+15
+    do_softirq_own_stack+55
+    irq_exit_rcu+142
+    sysvec_call_function_single+54
+    asm_sysvec_call_function_single+18
+    native_safe_halt+14
+    acpi_idle_do_entry+70
+    acpi_idle_enter+134
+    cpuidle_enter_state+137
+    cpuidle_enter+41
+    do_idle+495
+    cpu_startup_entry+25
+    start_kernel+1415
+    secondary_startup_64_no_verify+176
+]: 1
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    vmx_set_interrupt_shadow+76
+    skip_emulated_instruction+171
+    kvm_skip_emulated_instruction+40
+    kvm_emulate_halt+14
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 2
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    handle_io+101
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 2
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    vmw_cmdbuf_header_submit+133
+    vmw_cmdbuf_ctx_submit+177
+    vmw_cmdbuf_ctx_process+40
+    vmw_cmdbuf_man_process+85
+    __vmw_cmdbuf_cur_flush+173
+    vmw_cmdbuf_commit+109
+    vmw_fifo_send_fence+116
+    vmw_execbuf_fence_commands+80
+    vmw_kms_helper_validation_finish+113
+    vmw_du_helper_plane_update+714
+    vmw_stdu_plane_update_surface+196
+    vmw_stdu_primary_plane_atomic_update+177
+    drm_atomic_helper_commit_planes+184
+    drm_atomic_helper_commit_tail+66
+    commit_tail+206
+    drm_atomic_helper_commit+275
+    drm_atomic_helper_dirtyfb+392
+    vmw_fb_dirty_flush+798
+    process_one_work+438
+    worker_thread+83
+    kthread+283
+    ret_from_fork+31
+]: 2
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    sysvec_apic_timer_interrupt+49
+    asm_sysvec_apic_timer_interrupt+18
+]: 2
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    finish_task_switch+123
+    __schedule+650
+    schedule_idle+40
+    do_idle+359
+    cpu_startup_entry+25
+    start_kernel+1415
+    secondary_startup_64_no_verify+176
+]: 2
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    sysvec_apic_timer_interrupt+49
+    asm_sysvec_apic_timer_interrupt+18
+    __softirqentry_text_start+111
+    asm_call_sysvec_on_stack+15
+    do_softirq_own_stack+55
+    irq_exit_rcu+142
+    sysvec_apic_timer_interrupt+54
+    asm_sysvec_apic_timer_interrupt+18
+    native_safe_halt+14
+    acpi_idle_do_entry+70
+    acpi_idle_enter+134
+    cpuidle_enter_state+137
+    cpuidle_enter+41
+    do_idle+495
+    cpu_startup_entry+25
+    start_kernel+1415
+    secondary_startup_64_no_verify+176
+]: 5
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    start_sw_timer+370
+    kvm_set_lapic_tscdeadline_msr+154
+    kvm_set_msr_common+3175
+    kvm_set_msr_ignored_check+148
+    kvm_emulate_wrmsr+54
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 5
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    sysvec_apic_timer_interrupt+49
+    asm_sysvec_apic_timer_interrupt+18
+    __softirqentry_text_start+111
+    asm_call_sysvec_on_stack+15
+    do_softirq_own_stack+55
+    irq_exit_rcu+142
+    sysvec_apic_timer_interrupt+54
+    asm_sysvec_apic_timer_interrupt+18
+    native_safe_halt+14
+    acpi_idle_do_entry+70
+    acpi_idle_enter+134
+    cpuidle_enter_state+137
+    cpuidle_enter+41
+    do_idle+495
+    cpu_startup_entry+25
+    secondary_startup_64_no_verify+176
+]: 7
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    _raw_spin_unlock_irqrestore+17
+    e1000_update_stats+1728
+    e1000_watchdog+189
+    process_one_work+438
+    worker_thread+83
+    kthread+283
+    ret_from_fork+31
+]: 7
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    finish_task_switch+123
+    __schedule+650
+    schedule_idle+40
+    do_idle+359
+    cpu_startup_entry+25
+    secondary_startup_64_no_verify+176
+]: 8
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    _raw_spin_unlock_irqrestore+17
+    try_to_wake_up+801
+    rcuwait_wake_up+29
+    kvm_vcpu_kick+27
+    __apic_accept_irq+276
+    kvm_irq_delivery_to_apic_fast+233
+    kvm_irq_delivery_to_apic+70
+    kvm_apic_send_ipi+144
+    kvm_lapic_reg_write+1019
+    apic_mmio_write+100
+    write_mmio+90
+    emulator_read_write_onepage+288
+    emulator_read_write+202
+    segmented_write.isra.0+90
+    x86_emulate_insn+2153
+    x86_emulate_instruction+662
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 9
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    eventfd_write+197
+    vfs_write+192
+    ksys_write+95
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 9
+@[
+    kvm_vcpu_gfn_to_memslot+1
+    __direct_pte_prefetch+228
+    direct_page_fault+2264
+    kvm_mmu_page_fault+120
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 12
+@[
+    kvm_vcpu_gfn_to_memslot+1
+    kvm_vcpu_mark_page_dirty+14
+    set_spte+263
+    mmu_set_spte+281
+    direct_page_fault+2172
+    kvm_mmu_page_fault+120
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 13
+@[
+    kvm_vcpu_mark_page_dirty+1
+    set_spte+263
+    mmu_set_spte+281
+    direct_page_fault+2172
+    kvm_mmu_page_fault+120
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 13
+@[
+    kvm_vcpu_gfn_to_memslot+1
+    kvm_page_track_is_active+18
+    mmu_need_write_protect+49
+    make_spte+326
+    set_spte+167
+    mmu_set_spte+281
+    direct_page_fault+2172
+    kvm_mmu_page_fault+120
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 13
+@[
+    kvm_vcpu_gfn_to_memslot+1
+    kvm_mmu_hugepage_adjust+147
+    direct_page_fault+1634
+    kvm_mmu_page_fault+120
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 14
+@[
+    kvm_vcpu_gfn_to_memslot+1
+    try_async_pf+69
+    direct_page_fault+344
+    kvm_mmu_page_fault+120
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 14
+@[
+    kvm_vcpu_kick+1
+    __apic_accept_irq+276
+    kvm_irq_delivery_to_apic_fast+233
+    kvm_irq_delivery_to_apic+70
+    ioapic_service+281
+    ioapic_set_irq+197
+    kvm_ioapic_set_irq+97
+    kvm_set_irq+189
+    kvm_vm_ioctl_irq_line+35
+    kvm_vm_ioctl+359
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 23
+@[
+    kvm_vcpu_is_bsp+1
+    __kvm_migrate_pit_timer+24
+    __kvm_migrate_timers+22
+    kvm_arch_vcpu_ioctl_run+2155
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 28
+@[
+    kvm_vcpu_gfn_to_memslot+1
+    kvm_vcpu_mark_page_dirty+14
+    set_spte+263
+    mmu_set_spte+281
+    __direct_pte_prefetch+418
+    direct_page_fault+2264
+    kvm_mmu_page_fault+120
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 33
+@[
+    kvm_vcpu_gfn_to_memslot+1
+    kvm_page_track_is_active+18
+    mmu_need_write_protect+49
+    make_spte+326
+    set_spte+167
+    mmu_set_spte+281
+    __direct_pte_prefetch+418
+    direct_page_fault+2264
+    kvm_mmu_page_fault+120
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 33
+@[
+    kvm_vcpu_mark_page_dirty+1
+    set_spte+263
+    mmu_set_spte+281
+    __direct_pte_prefetch+418
+    direct_page_fault+2264
+    kvm_mmu_page_fault+120
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 33
+@[]: 81
+@[
+    kvm_vcpu_kick+1
+    __apic_accept_irq+276
+    kvm_irq_delivery_to_apic_fast+233
+    kvm_irq_delivery_to_apic+70
+    kvm_apic_send_ipi+144
+    kvm_lapic_reg_write+1019
+    apic_mmio_write+100
+    write_mmio+90
+    emulator_read_write_onepage+288
+    emulator_read_write+202
+    segmented_write.isra.0+90
+    x86_emulate_insn+2153
+    x86_emulate_instruction+662
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 107
+@[
+    kvm_vcpu_ioctl+1
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 496
+@[
+    kvm_vcpu_check_block+1
+    kvm_vcpu_block+449
+    kvm_arch_vcpu_ioctl_run+1733
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 759
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    native_safe_halt+14
+    acpi_idle_do_entry+70
+    acpi_idle_enter+134
+    cpuidle_enter_state+137
+    cpuidle_enter+41
+    do_idle+495
+    cpu_startup_entry+25
+    start_kernel+1415
+    secondary_startup_64_no_verify+176
+]: 5706
+@[
+    kvm_vcpu_kick+1
+    apic_timer_fn+27
+    __hrtimer_run_queues+298
+    hrtimer_interrupt+272
+    __sysvec_apic_timer_interrupt+95
+    asm_call_sysvec_on_stack+15
+    sysvec_apic_timer_interrupt+114
+    asm_sysvec_apic_timer_interrupt+18
+    native_safe_halt+14
+    acpi_idle_do_entry+70
+    acpi_idle_enter+134
+    cpuidle_enter_state+137
+    cpuidle_enter+41
+    do_idle+495
+    cpu_startup_entry+25
+    secondary_startup_64_no_verify+176
+]: 16958
+@[
+    kvm_vcpu_kick+1
+    __apic_accept_irq+276
+    kvm_inject_apic_timer_irqs+38
+    kvm_arch_vcpu_ioctl_run+2023
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 22864
+@[
+    kvm_vcpu_block+1
+    kvm_arch_vcpu_ioctl_run+1733
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 23213
+@[
+    kvm_vcpu_read_guest_page+1
+    kvm_fetch_guest_virt+129
+    __do_insn_fetch_bytes+282
+    x86_decode_insn+1884
+    x86_decode_emulated_instruction+93
+    x86_emulate_instruction+501
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 23344
+@[
+    kvm_vcpu_gfn_to_memslot+1
+    kvm_vcpu_read_guest_page+27
+    kvm_fetch_guest_virt+129
+    __do_insn_fetch_bytes+282
+    x86_decode_insn+1884
+    x86_decode_emulated_instruction+93
+    x86_emulate_instruction+501
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 23719
+@[
+    kvm_vcpu_check_block+1
+    kvm_vcpu_block+129
+    kvm_arch_vcpu_ioctl_run+1733
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 46386
+@[
+    kvm_vcpu_gfn_to_memslot+1
+    kvm_vcpu_gfn_to_hva_prot+18
+    paging64_walk_addr_generic+283
+    paging64_gva_to_gpa+63
+    kvm_fetch_guest_virt+83
+    __do_insn_fetch_bytes+282
+    x86_decode_insn+1884
+    x86_decode_emulated_instruction+93
+    x86_emulate_instruction+501
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 94830
+@[
+    kvm_vcpu_gfn_to_hva_prot+1
+    paging64_walk_addr_generic+283
+    paging64_gva_to_gpa+63
+    kvm_fetch_guest_virt+83
+    __do_insn_fetch_bytes+282
+    x86_decode_insn+1884
+    x86_decode_emulated_instruction+93
+    x86_emulate_instruction+501
+    kvm_arch_vcpu_ioctl_run+3038
+    kvm_vcpu_ioctl+529
+    __x64_sys_ioctl+131
+    do_syscall_64+51
+    entry_SYSCALL_64_after_hwframe+68
+]: 94866
+
+root@debian:~#

@@ -1,0 +1,9 @@
+We can use PowerShell to generate live kernel dump.
+
+
+C:\> Get-StorageSubSystem
+ FriendlyName                     HealthStatus OperationalStatus
+ ------------                     ------------ -----------------
+ Windows Storage on ntbox    Healthy      OK
+
+C:\> Get-StorageDiagnosticInfo -StorageSubSystemFriendlyName "Windows Storage on ntbox" -IncludeLiveDump -DestinationPath D:\LiveKernelDump

@@ -1,0 +1,42 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Linux kernel debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/vmlinux-5.10.0-12-amd64",
+            "miDebuggerPath": "gdb",
+            "miDebuggerServerAddress": "localhost:8864",   // required by vmware gdb stub
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "enable pretty printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    // load kernel symbol, note that this require disable KASLR in Linux guest os
+                    // otherwise the mapped kernel address is randomized after each boot
+                    "text": "add-symbol-file /debian-dbgsym/vmlinux-5.10.0-12-amd64 0xffffffff81000000",
+                },
+                {
+                    // set source path
+                    "text": "set dir /cygdrive/g/code/linux-5.10.103",
+                }
+            ],
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "logging": {
+                "engineLogging": false
+            },
+        }
+    ]
+}

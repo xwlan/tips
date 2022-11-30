@@ -1,0 +1,44 @@
+
+1, first method use VMWARE gdb stub
+
+add the following options to <vm-name>.vmx:
+
+debugStub.listen.guest32.remote = "TRUE"    
+debugStub.listen.guest64.remote = "TRUE"
+monitor.debugOnStartGuest32 = "TRUE"
+debugStub.hideBreakpoints = "TRUE"
+bios.bootDelay = "3000"
+
+
+host os: 
+gdb <vmlinuz-dbg>
+target remote localhost:8832 // 32 bits guest
+target remote localhost:8864 // 64 bits guest
+
+
+2, second method build linux with kgdb enabled
+   create \\.\pipe\com_1 in 2 linux virtual machine, one is server, one is
+   client, the other end both are virtual machine, this will use VMWARE as relay
+   to connect ttyS1 in debugger and debuggee machine.
+
+   for debuggee:
+    	add grub menu entry, add kgdboc, 115200, kgdbwait to linux boot command
+	line.
+
+	ensure /sys/module/kgdboc/parameters/kgdboc is ttyS1, 115200
+	use: echo g > /proc/sysrq_trigger, to trigger kgdb breakpoint
+
+   for debugger:
+	launch gdb, and execute:
+	1, file vmlinux
+        2, set serial baud 115200
+        3, target remote /dev/ttyS1
+
+	this will connect to remote /dev/ttyS1 in debuggee (which is relayed
+	by vmware.) 
+
+   kgdb has adavantage that info thread can list all created threads and can
+inspect their stack trace, if we use vmware stub, we have to manually walk the
+task_struct list one by one.
+
+

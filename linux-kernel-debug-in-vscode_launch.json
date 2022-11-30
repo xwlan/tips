@@ -1,0 +1,48 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Ubuntu 5.15.0-30 Debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "MIMode": "gdb",
+            "miDebuggerPath": "d:\\cygwin64\\bin\\gdb.exe",
+            "program": "d:\\code\\linux-source-5.15.0-debuginfo\\usr\\lib\\debug\\boot\\vmlinux-5.15.0-30-generic",
+            "setupCommands": [
+                {
+                    // avoid qGetTIBAddr packet error
+                    "text": "set osabi none",
+                },
+                {
+                    // connect to QEMU gdb stub
+                    "text": "target remote :1234",
+                },
+                {
+                    // load kernel symbol, note that this require disable KASLR in Linux guest os
+                    // otherwise the mapped kernel address is randomized after each boot
+                    // the default kernel image base is 0xffffffff81000000 for amd64 architecture
+                    "text": "add-symbol-file d:/code/linux-source-5.15.0-debuginfo/usr/lib/debug/boot/vmlinux-5.15.0-30-generic 0xffffffff81000000",
+                },
+                {
+                    // map original build path to debugger machine source path
+                    "text": "set substitute-path /build/linux-WD899k/linux-5.15.0  d:/code/linux-source-5.15.0"
+                },
+                {
+                    "text": "-enable-pretty-printing",
+                }
+            ],
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "logging": {
+                "engineLogging": false
+            },
+        }
+    ]
+}

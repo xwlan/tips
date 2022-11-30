@@ -1,0 +1,293 @@
+Examining Windows Kernel-mode Stacks via Triage Dumps
+
+
+
+
+It can occasionally be useful to be able to inspect the kernel-mode stack of a thread and Microsoft does indeed provide a tool (in the Debugging Tools for Windows kit) that enables this: KDbgCtrl. One of the tool’s command-line options is:
+
+ 
+-td ProcessID File
+Obtains a kernel triage dump file. Enter the process ID and a name for the dump file.
+There is not much publically available information about “kernel triage dump” files; the best references that I know of are:
+ 
+Examining kernel stacks on Vista/Srv08 using kdbgctrl -td, even when you haven’t booted /DEBUG
+Exploring the Microsoft Windows crash dump stack
+ReactOS kdtypes.h
+ 
+Motivational Example
+ 
+Examining the user-mode stacks of an unresponsive IIS worker process showed that many threads were stuck in this state:
+ 
+ntdll!NtQueryFullAttributesFile()+0x12
+KERNELBASE!GetFileAttributesExW()+0x93
+cachfile!CACHED_FILE_INFO::CheckIfFileHasChanged()+0xf9
+iiscore!W3_SERVER::GetFileInfo()+0x1c3
+defdoc!W3_DEFAULT_DOC_HANDLER::DoWork()+0x511
+defdoc!RequestDoWork()+0x17f
+defdoc!CIISHttpModule::OnExecuteRequestHandler()+0x19
+iiscore!NOTIFICATION_CONTEXT::RequestDoWork()+0x128
+iiscore!NOTIFICATION_CONTEXT::CallModulesInternal()+0x305
+iiscore!NOTIFICATION_CONTEXT::CallModules()+0x28
+iiscore!W3_CONTEXT::DoStateRequestExecuteHandler()+0x36
+iiscore!W3_CONTEXT::DoWork()+0xd7
+iiscore!W3_MAIN_CONTEXT::StartNotificationLoop()+0x49
+iiscore!W3_CONTEXT::ExecuteRequest()+0x20c
+isapi!ISAPI_REQUEST::ExecuteUrl()+0x3e6
+isapi!SSFExecuteUrl()+0x7f4
+isapi!ServerSupportFunction()+0x59b
+webengine4!EcbExecuteUrlUnicode()+0x12e
+ 
+Using kernel triage dumps, it was possible to see that the kernel stack of most of these threads looked like this:
+ 
+nt!DbgkpLkmdSnapThreadInContext+0x79
+nt!DbgkpLkmdSnapThreadApc+0x3b
+nt!KiDeliverApc+0x1e3
+nt!KiCommitThreadWait+0x3dd
+nt!KeWaitForSingleObject+0x19f
+nt!ExpWaitForResource+0xae
+nt!ExAcquireResourceExclusiveLite+0x14f
+rdbss!_RxAcquireFcb+0x254
+rdbss!RxFindOrCreateFcb+0x3d8
+rdbss!RxCreateFromNetRoot+0x53a
+rdbss!RxCommonCreate+0x34f
+rdbss!RxFsdCommonDispatch+0x870
+rdbss!RxFsdDispatch+0x224
+mrxsmb!MRxSmbFsdDispatch+0xc0
+mup!MupiCallUncProvider+0x169
+mup!MupStateMachine+0x165
+mup!MupCreate+0x31d
+fltmgr!FltpLegacyProcessingAfterPreCallbacksCompleted+0x24f
+fltmgr!FltpCreate+0x2a9
+nt!IopParseDevice+0x14e2
+nt!ObpLookupObjectName+0x784
+nt!ObOpenObjectByName+0x306
+nt!NtQueryFullAttributesFile+0x14f
+nt!KiSystemServiceCopyEnd+0x13 (TrapFrame @ fffff880`1adb9c20)
+ 
+The kernel-mode stack of another thread in the process partially explained what was happening:
+ 
+nt!DbgkpLkmdSnapThreadInContext+0x79
+nt!DbgkpLkmdSnapThreadApc+0x3b
+nt!KiDeliverApc+0x1e3
+nt!KiCommitThreadWait+0x3dd
+nt!KeWaitForMultipleObjects+0x272
+nt!FsRtlCancellableWaitForMultipleObjects+0xac
+mrxsmb!SmbCeWaitForCompletionAndFinalizeExchangeEx+0x70
+mrxsmb20!MRxSmb2Create+0x658
+mrxsmb!SmbpShellCreateWithNewStack+0x1b
+nt!KySwitchKernelStackCallout+0x27 (TrapFrame @ fffff880`12d6fe20)
+nt!KiSwitchKernelStackContinue
+nt!KeExpandKernelStackAndCalloutEx+0x2a2
+nt!KeExpandKernelStackAndCallout+0x12
+mrxsmb!SmbShellCreate+0x5d
+rdbss!RxCollapseOrCreateSrvOpen+0x4de
+rdbss!RxCreateFromNetRoot+0x608
+rdbss!RxCommonCreate+0x34f
+rdbss!RxFsdCommonDispatch+0x870
+rdbss!RxFsdDispatch+0x224
+mrxsmb!MRxSmbFsdDispatch+0xc0
+mup!MupiCallUncProvider+0x169
+mup!MupStateMachine+0x165
+mup!MupCreate+0x31d
+fltmgr!FltpLegacyProcessingAfterPreCallbacksCompleted+0x24f
+fltmgr!FltpCreate+0x2a9
+nt!IopParseDevice+0x14e2
+nt!ObpLookupObjectName+0x784
+nt!ObOpenObjectByName+0x306
+nt!IopCreateFile+0x2bc
+nt!NtCreateFile+0x78
+nt!KiSystemServiceCopyEnd+0x13 (TrapFrame @ fffff880`0c81bc20)
+ 
+In summary, one thread held a lock on the file control block of a particular file and was waiting for an “oplock” blocked SMB request to complete and the other threads were just waiting to obtain a lock on the file control block.
+ 
+Limitations of Triage Dumps
+ 
+Triage dumps have two major limitations:
+ 
+If a thread is badly “wedged” then the kernel APC which gathers the data won’t be able to run.
+The total size of a triage dump cannot exceed one megabyte; in my experience, this is enough space to hold information for 16 to 35 threads (the space required varies according to how much indirect data is included for a thread).
+ 
+In IIS worker processes, it is not uncommon to have several hundred threads, so the simple functionality offered by KDbgCtrl (just specify a process ID and retrieve as many threads as will fit in one megabyte) is normally inadequate to capture the kernel context of the worker threads. The only option is to develop a new tool to perform the capture, using the low-level (and undocumented) API.
+ 
+The Triage Dump API
+ 
+The triage dump functionality is exposed via the NtSystemDebugControl/ZwSystemDebugControl system function. One way of declaring this function in C# is:
+ 
+[DllImport("ntdll.dll")]
+static extern uint ZwSystemDebugControl(SYSDBG_COMMAND cmd, [MarshalAs(UnmanagedType.AsAny)] object xin, int nin, [Out] byte[] xout, int nout, out int n);
+
+public enum SYSDBG_COMMAND
+{
+    SysDbgGetTriageDump = 29,
+    SysDbgWriteLiveKernelDump = 37
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public class SYSDBG_TRIAGE_DUMP
+{
+    public uint Flags;
+    public uint BugCheckCode;
+    public IntPtr BugCheckParam1;
+    public IntPtr BugCheckParam2;
+    public IntPtr BugCheckParam3;
+    public IntPtr BugCheckParam4;
+    public uint ProcessHandles;
+    public uint ThreadHandles;
+    public IntPtr Handles; // points to IntPtr[]
+
+    public SYSDBG_TRIAGE_DUMP(IntPtr[] h)
+    {
+      BugCheckCode = 0x69696969;
+      ThreadHandles = (uint)h.Length;
+      Handles = Marshal.AllocHGlobal(IntPtr.Size * h.Length);
+      Marshal.Copy(h, 0, Handles, h.Length);
+    }
+}
+ 
+For a triage dump, the “cmd” is SYSDBG_COMMAND.SysDbgGetTriageDump, “Flags” is best set to zero, the “BugCheckCode” is conventionally set to 0x69696969, “ProcessHandles” must be zero and up to 16 (perhaps 40 at most) thread handles (to threads in a single process) with GENERIC_ALL access can be usefully included in the array of Handles (more can be added, but there probably won’t be space in the dump buffer to hold their data; when creating unattended triage dumps triggered by rare events, I err on the side of caution and specify at most 10 thread handles per dump). SeDebugPrivilege must be enabled as a prerequisite for creating a triage dump.
+ 
+An invocation of the function might look like this:
+ 
+IntPtr[] threads = […];
+SYSDBG_TRIAGE_DUMP triage = new SYSDBG_TRIAGE_DUMP(threads);
+byte[] dump = new byte[1024 * 1024];
+int n;
+
+Process.EnterDebugMode();
+
+ZwSystemDebugControl(SYSDBG_COMMAND.SysDbgGetTriageDump, triage, Marshal.SizeOf(triage), dump, dump.Length, out n);
+
+Process.LeaveDebugMode();
+ 
+The resulting array of bytes (“dump”), trimmed to length “n”, should then be written to file for analysis with the standard Microsoft tools (cdb, kd, windbg, etc.).
+ 
+The IDs of threads within a process can be obtained by a variety of mechanisms (including the Debugging API (WaitForDebugEvent et al) and the Tool Help Library) and thread handles can be obtained via the Win32 OpenThread API.
+ 
+Difficulties Analysing the Triage Dump
+ 
+If the KDbgCtrl command was used to create the dump, or the Tool Help Library used to identify the “first” n threads in the process in a “home-brew” dump, then there is a good chance that most of the useful content in the dump can be viewed with a command like “!process -1 1f”.
+ 
+The key here is that the threads in the dump should be the first threads in the linked-list of threads in the kernel process object. The “!process -1 1f” command will read the kernel process object (which is included in the dump file) and follow the linked-list of thread objects, dumping each thread in turn. Under stable conditions, the order of threads returned by the Tool Help Library (and similar mechanisms) will correspond to their actual order in the kernel linked-list – however, this is an implementation artefact rather than a guarantee.
+ 
+One way of dumping all of the kernel thread contexts in, say, an IIS worker process, is to march through all of the threads, creating a separate triage dump for each batch of, say, 16 threads. The first such triage dump can be viewed with “!process -1 1f”, but a different command will be required for subsequent dump files. Assuming that the threads have been dumped in the same order as the linked-list of threads, the following commands can be used: “!thread” to see the first thread in the triage dump (the format of the dump file and the mechanisms used by the debugger extensions ensure that this will work) and “!list -t nt!_KTHREAD.ThreadListEntry.Flink -x "!thread" -a "1f" $thread” to view all of the threads.
+ 
+If, however, the threads to be dumped have been selected according to some criteria (e.g. thread state or user mode stack frame content), it is unlikely that they will be chained together and other techniques must be used. One such technique is to search the virtual address space captured in the dump file for plausible thread objects. The pool header (and pool tag) of the thread object is not included in the triage dump, so searching for ‘Thre’, say, would be unproductive. One command that normally works is:
+ 
+.foreach (t { s -[1]q ($thread & fffffe0000000000) L? 1ffffffffff $proc }) { !thread t - 220 1f }
+ 
+The address range is arrived at by trial and error, balancing time for the search against the size of the search area. There is not enough information in the triage dump to deduce “likely” ranges (e.g. non-paged pool boundaries); the address of the process object and the first thread object give an example of the addresses that need to be covered by the search range. The value (0x)220 is obtained from this command: “dt nt!_KTHREAD Process”. What the command does is to search for pointers to the process object, assume that the location containing the pointer is the Process field of a KTHREAD structure and then attempt to interpret the data at the purported thread object address as a thread.
+ 
+An Alternative Approach
+ 
+One of the many ways of obtaining a list of threads in a process is to use the Native API function NtQuerySystemInformation/ZwQuerySystemInformation (this is, in fact, the basis for most of the other methods too). This API offers no major advantages when just obtaining the list of thread IDs (with the SystemProcessInformation or SystemExtendedProcessInformation information classes) but, once using the Native API, it can be useful to use other information classes too – especially SystemHandleInformation or SystemExtendedHandleInformation. The information returned for these classes (for each open handle) is structured like this:
+ 
+[StructLayout(LayoutKind.Sequential)]
+struct SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX
+{
+    public IntPtr Object;
+    public IntPtr UniqueProcessId;
+    public IntPtr HandleValue;
+    public uint GrantedAccess;
+    public ushort CreatorBackTraceIndex;
+    public ushort ObjectTypeIndex;
+    public uint HandleAttributes;
+    public uint Reserved;
+}
+
+Of particular interest is the “Object” field – this is the virtual address of the kernel object corresponding to the handle. If one has a handle to a thread object, say, one can search the information returned by the API call, using the current process ID and thread handle value, for the kernel address of the thread object. When saving a triage dump, one can then “augment” the dump with the known addresses of the thread objects contained within it. A simple way of “augmenting” the dump file is to include an encoding of the thread addresses in the name of the dump file (but watch out for exceeding the maximum file name length); another option might be to store the information in an alternative data stream of the dump file or even in a separate file. Up to 4 thread addresses could be saved in the dump file itself by using the BugCheckParamN fields of the SYSDBG_TRIAGE_DUMP structure.
+ 
+Kernel Live Memory Dump
+ 
+Newer versions of Windows include a new SYSDBG_COMMAND value (SysDbgWriteLiveKernelDump) and an additional structure definition that allow the kernel address space of a live system to be written to disk (without crashing the system).
+ 
+[StructLayout(LayoutKind.Sequential)]
+class SYSDBG_LIVEDUMP_CONTROL
+{
+    public uint Version;
+    public uint BugCheckCode;
+    public IntPtr BugCheckParam1;
+    public IntPtr BugCheckParam2;
+    public IntPtr BugCheckParam3;
+    public IntPtr BugCheckParam4;
+    public SafeFileHandle DumpFileHandle;
+    public SafeWaitHandle CancelEventHandle;
+    public SYSDBG_LIVEDUMP_CONTROL_FLAGS Flags;
+    public SYSDBG_LIVEDUMP_CONTROL_ADDPAGES AddPagesControl;
+
+    public SYSDBG_LIVEDUMP_CONTROL(FileStream fs)
+    {
+      BugCheckCode = 0x69696969;
+      DumpFileHandle = fs.SafeFileHandle;
+      CancelEventHandle = new SafeWaitHandle(IntPtr.Zero, false);
+    }
+}
+
+[Flags]
+enum SYSDBG_LIVEDUMP_CONTROL_FLAGS
+{
+    IncludeUserSpaceMemoryPages = 4
+}
+
+[Flags]
+enum SYSDBG_LIVEDUMP_CONTROL_ADDPAGES
+{
+    HypervisorPages = 1
+}
+
+Unless live kernel debugging has been enabled, only kernel mode virtual addresses are dumped. If kernel live debugging has been enabled then a control flag is provided to specify whether user space memory pages should be included in the dump.
+ 
+As with a triage dump, SeDebugPrivilege must be enabled to use this feature, the bug check code is conventionally set to 0x69696969 and the bug check params are included in the dump as given. The “Version” field is not currently inspected (but one won’t go far wrong if one sets it to 1) and the file handle must be opened for synchronous I/O. A kernel live dump can take several tens of seconds to complete, so a mechanism to abort/cancel the dump is provided (the CancelEventHandle).
+ 
+An invocation of the function might look like this:
+ 
+Process.EnterDebugMode();
+
+using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite))
+{
+    int n;
+
+    SYSDBG_LIVEDUMP_CONTROL live = new SYSDBG_LIVEDUMP_CONTROL(fs);
+
+    ZwSystemDebugControl(SYSDBG_COMMAND.SysDbgWriteLiveKernelDump, live, Marshal.SizeOf(live), null, 0, out n);
+}
+
+Process.LeaveDebugMode();
+ 
+The resulting dump is a full-value kernel memory dump and all of the normal kernel memory dump analysis/inspection techniques can be used.
+ 
+ETW Tracing of Kernel Live Memory Dump
+ 
+The Kernel Live Memory Dump functionality has been instrumented with manifest-based ETW (the provider “Microsoft-Windows-Kernel-LiveDump”). The following is a textual interpretation of the trace output, preceded on each line by the time (in seconds) since the start of the trace:
+ 
+06.8533715 Live Dump Capture Dump Data API started.
+06.8535649 Sizing Workflow: RemovePages Callbacks started.
+06.8535652 Sizing Workflow: RemovePages Callbacks ended.
+06.8535979 Sizing Workflow: Mirroring started.
+06.8586117 Sizing Workflow: Mirroring Phase 0 ended.
+06.8586136 Sizing Workflow: System Quiesce started.
+07.0432997 Sizing Workflow: Mirroring Phase 1 ended.
+07.0556710 Sizing Workflow: System Quiesce ended.
+07.0560841 Sizing Workflow: Estimation. NT: 1675096064 bytes (Minimum 37429248 bytes). Hypervisor: Primary 0 bytes. Secondary 0 bytes.
+07.2512462 Sizing Workflow: Allocation. NT: 1675100160 bytes. Hypervisor: Primary 0 bytes. Secondary 0 bytes.
+07.2512920 Capture Pages Workflow: Mirroring started.
+07.2568896 Capture Pages Workflow: Mirroring Phase 0 ended.
+07.2609501 Capture Pages Workflow: System Quiesce started.
+07.4204586 Capture Pages Workflow: Mirroring Phase 1 ended.
+07.4346195 Capture Pages Workflow: Copy memory pages started.
+07.7354418 Capture Pages Workflow: Copy memory pages ended.
+07.7354793 Capture Pages Workflow: System Quiesce ended.
+07.7356464 Writing dump file started.
+41.8362706 Writing dump file ended. NT Status: 0x0. Total 1571217408 bytes (Header|Primary|Secondary: 286720|1570930688|0 bytes).
+41.8362725 Live Dump Capture Dump Data API ended. NT Status: 0x0.
+ 
+In this example, a little under one second was needed to prepare the dump and about 34 seconds was required to write the 1.5GB dump to
+
+
+Posted by Gary Nebbett at 15:48 
+Email This
+BlogThis!
+Share to Twitter
+Share to Facebook
+Share to Pinterest
+Labels: Dump, Kernel, NtSystemDebugControl, SYSDBG_TRIAGE_DUMP, Triage, Windows, ZwSystemDebugControl
+1 comment:

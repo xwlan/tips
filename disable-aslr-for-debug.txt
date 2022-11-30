@@ -1,0 +1,22 @@
+// change GRUB_CMDLINE_LINUX entry and add `nokaslr` to the end
+//
+
+[xwlan@fedora ~]$ cat /etc/default/grub
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+GRUB_DEFAULT=saved
+GRUB_DISABLE_SUBMENU=true
+GRUB_TERMINAL_OUTPUT="console"
+GRUB_CMDLINE_LINUX="rhgb quiet nokaslr"
+GRUB_DISABLE_RECOVERY="true"
+GRUB_ENABLE_BLSCFG=true
+
+//
+// sudo grub2-mkconfig -o /boot/grub2/grub.cfg to update grub and reboot
+// this apply to Fedora, for Debian,  use `sudo update-grub`
+//
+
+[xwlan@fedora ~]$ sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+Generating grub configuration file ...
+Adding boot menu entry for UEFI Firmware Settings ...
+done

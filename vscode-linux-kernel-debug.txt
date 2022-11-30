@@ -1,0 +1,57 @@
+GNU gdb (GDB) (Cygwin 8.3.1-1) 8.3.1
+Copyright (C) 2019 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-pc-cygwin".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word".
+Warning: Debuggee TargetArchitecture not detected, assuming x86_64.
+=cmd-param-changed,param="pagination",value="off"
+0xffffffff902c636e in ?? ()
+
+Thread 1 received signal SIGINT, Interrupt.
+0xffffffff902c636e in ?? ()
+Execute debugger commands using "-exec <command>", for example "-exec info registers" will list registers in use (when GDB is the debugger)
+-exec add-symbol-file /debian-dbgsym/vmlinux-5.10.0-12-amd64 ffffffff8fa00000
+add symbol table from file "/debian-dbgsym/vmlinux-5.10.0-12-amd64" at
+No symbol "ffffffff8fa00000" in current context.
+
+#
+# add-symbol-file to add kernel symbol and set its correct mapped address.
+# via cat /proc/kallsym | grep 'startup_64' in Linux guest os, because
+# ALSR, the address can change for each boot, this can be disable in grub 
+# command line
+#
+
+-exec add-symbol-file /debian-dbgsym/vmlinux-5.10.0-12-amd64 0xffffffff8fa00000
+add symbol table from file "/debian-dbgsym/vmlinux-5.10.0-12-amd64" at
+	.text_addr = 0xffffffff8fa00000
+(y or n) [answered Y; input not from terminal]
+Reading symbols from /debian-dbgsym/vmlinux-5.10.0-12-amd64...
+
+#
+# set Linux kernel source directory
+#
+
+-exec set dir /cygdrive/g/code/linux-5.10.103
+=cmd-param-changed,param="directories",value="/cygdrive/g/code/linux-5.10.103:$cdir:$cwd"
+
+
+Thread 1 hit Breakpoint 4, ep_poll_callback (wait=0xffff9a39c72a99f0, mode=3, sync=0, key=0x1 <fixed_percpu_data+1>) at fs/eventpoll.c:1219
+1219		read_lock_irqsave(&ep->lock, flags);
+No breakpoint number 1.
+[Switching to Thread 2]
+
+Thread 2 hit Breakpoint 4, ep_poll_callback (wait=0xffff9a39c2b9c960, mode=3, sync=0, key=0x1 <fixed_percpu_data+1>) at fs/eventpoll.c:1219
+1219		read_lock_irqsave(&ep->lock, flags);
+
+Thread 2 hit Breakpoint 5, ep_poll_callback (wait=0xffff9a39c72a99f0, mode=<optimized out>, sync=<optimized out>, key=0x1 <fixed_percpu_data+1>) at fs/eventpoll.c:1261
+1261			if ((epi->event.events & EPOLLEXCLUSIVE) &&
