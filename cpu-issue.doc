@@ -1,0 +1,13 @@
+#
+# This doc collect CPU related tips, e.g. frequently asked questions,
+# useful script, method
+#
+
+Q1:
+I've identified the high CPU process. Is it possible to debug it?
+To retrieve the list of threads, you can use the following script. It shows the stack of each thread of top three high CPU processes:
+
+A1:
+for H_PID in $(ps -eo pcpu,pid,ppid,user,args | \
+sort -k1 -r | grep -v PID | head -3 | \
+awk '{print $2}'); do ps -Llp $H_PID; sudo cat /proc/$H_PID/stack; echo; done
