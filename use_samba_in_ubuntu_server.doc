@@ -1,0 +1,77 @@
+1, install samba
+	apt update
+	apt install samba -y
+
+2, create share folder
+	mkdir -p /srv/samba/share
+	chmod 1777 /srv/samba/share # 设置粘滞位允许用户管理自己的文件
+
+3, config samba
+	vi /etc/samba/smb.conf
+
+	#add the followings in conf
+	
+	[share]
+		comment = "ubuntu samba share"
+		path = /srv/samba/share
+		browseable = yes
+		guest ok = no
+		create mask = 0775
+		directory mask = 0775
+		valid users = @samba-users # permitted user group
+
+4, create samba user and group
+	# create samba group
+	groupadd samba-users
+	# add user to group
+	useradd -M -s /usr/sbin/nologin -G samba-users samba-user
+	# set samba password
+	smbpasswd -a samba-user
+	# enable user
+	smbpasswd -e samba-user
+
+5, set permission of share folder
+	chown -R :samba-users /srv/samba/share
+	chown -R 2775 /srv/samba/share # 设置SGID保持组权限
+
+6, config service
+	
+	# test conf file parameters
+	testparm
+
+	# restart service
+	systemctl restart smbd nmbd
+
+	# enable service when boot
+	systemctl enable smbd nmbd
+
+7, config firewall (in case ufw)
+
+	ufw allow samba
+	or:
+	ufw allow 137,138/udp
+	ufw allow 139,445/tcp
+
+8, client test
+	Linux:	
+	smbclient //your-server-ip/share -U samba-user
+	
+	Windows:
+	\\your-server-ip\share
+
+9, debugging
+	# check service status	
+	systemctl status smbd
+
+	# log monitoring
+	tail -f /var/log/samba/log.smbd
+
+	# list all share
+	smbclient -L localhost -U%
+
+	# check listen port
+	ss -tulpn | grep smbd
+
+
+	
+	
