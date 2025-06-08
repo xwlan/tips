@@ -1,0 +1,16 @@
+# Q1:
+#this parameter can be used to free page cache and
+#dont' affect normal working of applications.
+
+# A1:
+# sync, flush data onto disk
+# echo 3
+# 0 (default) no free, managed by kernel
+# 1 free page cache
+# 2 free dentry and inode cache
+# 3 free all cache
+
+sync; echo 3 > /proc/sys/vm/drop_caches
+
+# Q2:
+# A2:
