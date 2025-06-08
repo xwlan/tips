@@ -1,0 +1,42 @@
+#
+# Q1:
+# how to check whether disk is full
+#
+#
+# A1:
+#
+
+step 1: which mount point is full
+	df -h
+
+step 2: which directory occupy most space
+	sudo du -h --max-depth=1 / | sort -hr | head -n 10
+
+	# find most-occupied-directory, assume it's /data,
+	#do it again
+
+	sudo du -h --max-depth=3 /data | sort -hr | head -n 10
+
+step 3: find largest file
+	find /data -type f -size +1G -exec ls -lh {} \; 2>/dev/null | sort -k5 -hr | head -n 20
+
+step 4: find deleted files which still occupy space
+	lsof | grep deleted
+
+step 5: quick clean up tips
+
+	clean log content 7 days ago:
+        find /var/log -type f -name "*.log" -mtime +7 -exec rm -f {} \;
+       
+        clean up docker:
+        docker system prune -af
+
+	clean up apt cache:
+	sudo apt clean
+
+	clean up yum cache:
+	sudo yum clean all
+
+# Q2:
+# A2:
+
