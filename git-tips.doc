@@ -1,0 +1,33 @@
+# Q1: git rebase formula
+# A1:
+	git rebase -i --onto <base> <start> <end> # (start, end]
+
+	e.g. :
+	git rebase -i --onto master f0e3d27 new   # new is a branch
+
+	we can use simplied version of this formula:
+	# if we're not on new branch
+	git rebase master new
+
+	# if we're on new branch
+	git rebase master new
+
+	# because implicitly execute `git switch new`, so we can ignore new
+	# if we're on new branch
+	git rebase master
+
+
+# Q2: How to update a commit to a detached HEAD of a specified branch
+# A2:
+	method 1: (recommend)
+	git switch new # or git checkout new
+	git reset 8bbef0b --hard # assume this commit is detached HEAD
+
+	method 2:
+	git update-ref refs/heads/new 8bbef0b
+	git switch new
+
+	method 3:
+	git branch -D new
+	git branch new 8bbef0b
+
