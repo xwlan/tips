@@ -1,0 +1,19 @@
+# Q1: How to set time stamp for command execution in history
+# A1: export HISTTIMEFORMAT="%d/%m/%y %T "
+
+	e.g. :
+
+	[root@localhost ~]# export HISTTIMEFORMAT="%d/%m/%y %T "
+	[root@localhost ~]# history
+
+	or :
+
+	[root@localhost ~]# cat >> /etc/profile << EOF
+	export HISTTIMEFORMAT="%d/%m/%y %T "
+	EOF
+
+	[root@localhost ~]# source /etc/profile
+	[root@localhost ~]# history
+	    1  03/10/24 10:48:01 lsblk
+	    2  03/10/24 10:48:01 echo $LANG
+
