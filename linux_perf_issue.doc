@@ -1,0 +1,16 @@
+# Q1: how to use kernel source code with perf tool
+#
+
+# A1:
+#   Assume a distribution built under the original path /build/linux-abcd/linux-source-6.8.0,
+    we can create a symbolic link to point to our real, installed source path at /usr/src/linux-source-6.8.0:
+
+    mkdir -p /build/linux-abcd
+    cd /build/linux-abcd
+    ln -s /usr/src/linux-source-6.8.0   linux-source-6.8.0
+
+    perf tool will automatically annotate perf data after load vmlinux image file which contain originally built
+    source code path.
+
+
+
