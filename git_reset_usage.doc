@@ -1,0 +1,57 @@
+以下是 git reset 命令的详细用法总结，结合核心功能、模式差异及实战场景：
+
+一、核心作用
+移动 HEAD 指针到指定提交，并可选择重置暂存区或工作区：
+取消 git add 操作
+丢弃未提交的修改
+回退分支状态
+
+
+二、三种模式对比
+--soft	:	git reset --soft HEAD~1	仅移动 HEAD，保留修改在暂存区	修改提交信息或合并提交12
+--mixed	:	git reset HEAD~1	移动 HEAD，保留修改在工作区 (默认模式) 撤销提交但保留代码修改25
+--hard	:	git reset --hard HEAD~1	移动 HEAD，丢弃所有修改, 彻底回退到历史版本, 慎用
+
+		注意：--hard 会永久删除未提交的修改，操作前需确认备份.
+
+
+三、高频使用场景
+
+1️⃣ 销最近一次提交但, 保留代码
+git reset HEAD~1      # 等价于 --mixed，修改保留在工作目录
+适用：提交后发现漏文件或需修改提交信息
+
+2️⃣ 改最后一一次提交（不产生新记录）
+git add missed_file        # 补充修改到暂存区
+git reset --soft HEAD~1    # 回退 HEAD 但保留暂存区修改
+git commit -m "新描述"     # 重新提交（覆盖原提交）
+效果：合并当前修改到上一次提交
+
+3️⃣ 丢弃本地所有修改
+git reset --hard HEAD   # 工作区和暂存区回退到最后一次提交状态
+git clean -df           # 删除新增的未跟踪文件（需额外执行）
+
+4 回退到远程仓库状态
+git reset --hard origin/main  # 强制对齐远程 main 分支
+
+5 回退单个文件
+git reset HEAD~1 -- path/to/file.c  # 仅将特定文件回退到历史版本
+git checkout HEAD~1 -- path/to/file.c  # 替代方案（保留提交历史）
+
+
+四、关键注意事项
+
+远程仓库风险：
+若已推送提交，回退后需 git push --force 覆盖远程分支，可能影响协作23
+
+二进制文件处理：
+--hard 无法清除编译生成的文件，需配合 git clean -df8
+
+替代方案：
+需保留提交历史, 用 git revert（生成反向提交）
+临时保存修改, 用 git stash
+
+ 五、总结口诀
+软重置（soft）：只动指针，不改代码（暂存区保留）
+混合重置（mixed）：动指针+清暂存（代码留工作区）
+硬重置（hard）：全盘重置，慎用
