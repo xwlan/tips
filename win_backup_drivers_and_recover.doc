@@ -1,0 +1,7 @@
+Backup:
+=======
+dism /online /export-driver /destination:C:\drivers
+
+Recover:
+========
+pnputil /add-driver "C:\drivers\*.inf" /subdirs /install /reboot
