@@ -1,0 +1,12 @@
+CMD
+======= 
+d:\iso>certutil -hashfile "en-us_windows_server_2025_updated_may_2025_x64_dvd_9c776dbb.iso" SHA256
+SHA256 的 en-us_windows_server_2025_updated_may_2025_x64_dvd_9c776dbb.iso 哈希:
+116aeec7421f7c52ce7fe4836e68735128f52690ebebba3c91074f6265f0c2c6
+CertUtil: -hashfile 命令成功完成。
+
+MSYS2
+===== 
+$ sha256sum.exe en-us_windows_server_2025_updated_may_2025_x64_dvd_9c776dbb.iso
+116aeec7421f7c52ce7fe4836e68735128f52690ebebba3c91074f6265f0c2c6 *en-us_windows_server_2025_updated_may_2025_x64_dvd_9c776dbb.iso
+
