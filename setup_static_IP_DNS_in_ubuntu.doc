@@ -1,0 +1,24 @@
+1, 
+sudo nano /etc/netplan/01-netcfg.yaml  # 文件名可能不同
+
+network:
+  version: 2
+  renderer: networkd   # 服务器版用networkd，桌面版用NetworkManager
+  ethernets:
+    ens33:             # 替换为你的网卡名
+      dhcp4: no        # 关闭DHCP
+      addresses:
+        - 192.168.1.100/24  # 静态IP/CIDR掩码
+      routes:
+        - to: default
+          via: 192.168.1.1   # 网关
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]  # DNS服务器
+
+2,
+sudo netplan apply    # 立即生效
+sudo netplan try      # 测试配置（120秒后自动回滚）
+
+
+Ubuntu 16.04及更早版本使用interfaces文件类似debian.
+

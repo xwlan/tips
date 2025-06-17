@@ -1,0 +1,32 @@
+# 修改 /etc/rc.conf
+vi /etc/rc.conf  
+
+# 设置静态 IP（推荐 CIDR 格式）
+ifconfig_em0="inet 192.168.1.100/24"  # em0 为网卡名，使用 `ifconfig` 确认
+# 或旧版格式：ifconfig_em0="inet 192.168.1.100 netmask 255.255.255.0"
+
+# 设置默认网关
+defaultrouter="192.168.1.1"  # 替换为实际网关地址
+
+# 设置主机名（可选）
+hostname="freebsd"
+
+#重启网络服务生效
+service netif restart    # 重启网络接口
+service routing restart  # 重启路由服务
+# 或直接执行
+/etc/netstart            # 综合重启命令
+
+# 修改DNS配置文件
+vi /etc/resolv.conf  # 编辑 DNS 配置
+
+nameserver 223.5.5.5    # 阿里公共 DNS
+nameserver 8.8.8.8      # Google 公共 DNS
+# 可以配置私有DNS server, 比如为Hyper-V虚拟机配置的主机名称解析服务
+# 主机的Windows Server要安装DNS service
+nameserver 192.168.10.111
+
+
+# 验证
+ifconfig , ping, nslookup, netstat -rn 等
+

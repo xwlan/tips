@@ -1,0 +1,29 @@
+# IP
+sudo nano /etc/network/interfaces
+
+auto eth0 
+iface eth0 inet static
+    address 192.168.1.100   # 静态IP
+    netmask 255.255.255.0   # 子网掩码
+    gateway 192.168.1.1     # 网关
+
+# DNS
+sudo nano /etc/resolv.conf
+
+nameserver 114.114.114.114
+nameserver 8.8.8.8
+
+# Debian 9及之前
+sudo service networking restart
+
+# Debian 10及之后
+sudo systemctl restart networking
+
+ip route show  # 确认网关
+ping 192.168.1.1  # 测试网关连通性
+
+ping google.com  # 测试域名解析
+nslookup example.com  # 检查DNS查询
+
+#临时调试可用
+sudo ip addr add 192.168.1.100/24 dev eth0 

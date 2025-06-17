@@ -1,0 +1,48 @@
+#
+# 通过 nmcli
+#
+
+nmcli connection show
+# 输出类似：ens192  a5e649f5-32ba-...  ethernet  ens192
+
+sudo nmcli connection modify "ens192" \
+  ipv4.method manual \
+  ipv4.addresses "192.168.1.100/24" \
+  ipv4.gateway "192.168.1.1"
+
+sudo nmcli connection modify "ens192" \
+  ipv4.dns "8.8.8.8 1.1.1.1" \
+  ipv4.ignore-auto-dns yes  # 禁用 DHCP 的 DNS
+
+sudo nmcli connection down "ens192"
+sudo nmcli connection up "ens192"
+
+#
+#手动编辑配置文件
+#
+
+sudo vim /etc/NetworkManager/system-connections/ens192.nmconnection
+
+[ipv4]
+method=manual
+dns=8.8.8.8;1.1.1.1;  # 分号分隔
+dns-search=
+addresses1=192.168.1.100/24,192.168.1.1  # IP/CIDR,网关
+ignore-auto-dns=true
+
+
+sudo systemctl restart NetworkManager
+
+#
+# 验证
+#
+
+ip addr show ens192
+
+ip route show default
+
+nmcli dev show
+
+ping -c 4 google.com
+
+

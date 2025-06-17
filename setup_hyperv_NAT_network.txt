@@ -1,0 +1,74 @@
+1， create internal switch, here it's 'Default Switch'
+
+PS C:\Users\Administrator> Get-NetAdapter
+
+Name                      InterfaceDescription                    ifIndex Status       MacAddress             LinkSpeed
+----                      --------------------                    ------- ------       ----------             ---------
+vEthernet (Default Swi... Hyper-V Virtual Ethernet Adapter #2          19 Up           00-15-5D-0A-F4-01        10 Gbps
+Ethernet                  Realtek Gaming GbE Family Controller         15 Up           18-C0-4D-D3-B3-43         1 Gbps
+vEthernet (External Sw... Hyper-V Virtual Ethernet Adapter             11 Up           18-C0-4D-D3-B3-43         1 Gbps
+
+
+2, create IP address for Default Switch
+
+PS C:\Users\Administrator> New-NetIPAddress -IPAddress 139.54.20.1 -PrefixLength 24 -InterfaceIndex 19
+
+
+IPAddress         : 139.54.20.1
+InterfaceIndex    : 19
+InterfaceAlias    : vEthernet (Default Switch)
+AddressFamily     : IPv4
+Type              : Unicast
+PrefixLength      : 24
+PrefixOrigin      : Manual
+SuffixOrigin      : Manual
+AddressState      : Tentative
+ValidLifetime     :
+PreferredLifetime :
+SkipAsSource      : False
+PolicyStore       : ActiveStore
+
+IPAddress         : 139.54.20.1
+InterfaceIndex    : 19
+InterfaceAlias    : vEthernet (Default Switch)
+AddressFamily     : IPv4
+Type              : Unicast
+PrefixLength      : 24
+PrefixOrigin      : Manual
+SuffixOrigin      : Manual
+AddressState      : Invalid
+ValidLifetime     :
+PreferredLifetime :
+SkipAsSource      : False
+PolicyStore       : PersistentStore
+
+
+3, enable NAT network, as per MS doc, only one NAT network is supported.
+
+PS C:\Users\Administrator> New-NetNat -Name HypervNAT -InternalIPInterfaceAddressPrefix 139.54.20.0/24
+
+
+Name                             : HypervNAT
+ExternalIPInterfaceAddressPrefix :
+InternalIPInterfaceAddressPrefix : 139.54.20.0/24
+IcmpQueryTimeout                 : 30
+TcpEstablishedConnectionTimeout  : 1800
+TcpTransientConnectionTimeout    : 120
+TcpFilteringBehavior             : AddressDependentFiltering
+UdpFilteringBehavior             : AddressDependentFiltering
+UdpIdleSessionTimeout            : 120
+UdpInboundRefresh                : False
+Store                            : Local
+Active                           : True
+
+
+# NOTE: Under Windows Server 2025, we need tune firewall to allow ICMP packet from VM to host.
+# enable the following rule:
+
+Virtual Machine Monitoring (Echo Request - ICMPv4-In)
+
+
+
+
+
+
