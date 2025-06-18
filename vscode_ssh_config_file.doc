@@ -1,0 +1,13 @@
+#
+# config ssh use binary in /usr/bin of msys2
+#
+
+Host ubuntu.mshome.net
+  HostName ubuntu.mshome.net
+  User xwlan
+  IdentityFile D:/msys64/home/xwlan/.ssh/id_ed25519
+
+Host fedora.mshome.net
+  HostName fedora.mshome.net
+  User xwlan
+  IdentityFile D:/msys64/home/xwlan/.ssh/id_ed25519
