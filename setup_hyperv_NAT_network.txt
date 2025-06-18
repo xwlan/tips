@@ -61,6 +61,23 @@ UdpInboundRefresh                : False
 Store                            : Local
 Active                           : True
 
+PS C:\Users\xwlan> Get-NetNAT
+
+
+Name                             : HypervNAT
+ExternalIPInterfaceAddressPrefix :
+InternalIPInterfaceAddressPrefix : 139.54.20.0/24
+IcmpQueryTimeout                 : 30
+TcpEstablishedConnectionTimeout  : 1800
+TcpTransientConnectionTimeout    : 120
+TcpFilteringBehavior             : AddressDependentFiltering
+UdpFilteringBehavior             : AddressDependentFiltering
+UdpIdleSessionTimeout            : 120
+UdpInboundRefresh                : False
+Store                            : Local
+Active                           : True
+
+
 
 # NOTE: Under Windows Server 2025, we need tune firewall to allow ICMP packet from VM to host.
 # enable the following rule:
