@@ -99,3 +99,11 @@ mount -t cifs -o credentials=~/.win_creds //192.168.1.100/Project /mnt/win_share
 #
 
 //192.168.1.100/Project  /mnt/win_share  cifs  credentials=/home/user/.win_creds,uid=1000,gid=1000  0  0
+
+#
+# real share on ubuntu.mshome.net VM
+#
+
+xwlan@ubuntu:~$ sudo mount -t cifs //ntbox.mshome.net/linux /srv/linux -o username=xwlan_2,password=Password01!
+
+
