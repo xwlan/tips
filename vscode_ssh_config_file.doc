@@ -11,3 +11,21 @@ Host fedora.mshome.net
   HostName fedora.mshome.net
   User xwlan
   IdentityFile D:/msys64/home/xwlan/.ssh/id_ed25519
+
+
+# another example
+Host workspace1
+  User user1
+  IdentityFile ~/.ssh/id_rsa_user1
+  Port 22
+  HostName xxx.xxx.xxx.xxx
+Host workspace2
+  User user2
+  IdentityFile ~/.ssh/id_rsa_user2
+  Port 1022
+  HostName xxx.xxx.xxx.xxx
+Host workspace3
+  User user3
+  IdentityFile ~/.ssh/id_rsa_user3
+  Port 2022
+  HostName xxx.xxx.xxx.xxx
