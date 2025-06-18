@@ -1,0 +1,7 @@
+在 Msysy2 ~/.bashrc 中增加：
+export MSYS=winsymlinks:nativestrict
+
+需要管理员权限执行.
+
+使用windows native的mklink 也可以(preferred)
+
