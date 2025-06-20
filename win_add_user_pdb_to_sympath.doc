@@ -1,0 +1,30 @@
+#
+# 这是下载的foobar2000提供的pdb symbols.
+#
+
+xwlan@ntbox MINGW64 /d/cache
+$ ls 2025-05-09-0D598A73-07F8-425D-B041-4F7BCA4C3596/
+foo_converter.pdb  foo_fileops.pdb  foo_input_std.pdb  foo_unpack.pdb  shared.pdb
+foo_dsp_std.pdb    foo_freedb2.pdb  foo_ui_std.pdb     foobar2000.pdb  sqlite3.pdb
+
+#
+# 切换到cmd.exe, 使用symstore把pdb加入到d:\symbol, 这是本机的_NT_SYMBOL_PATH
+#
+
+d:\winsdk\Debuggers\x64>symstore.exe add /r /f "d:\cache\2025-05-09-0D598A73-07F8-425D-B041-4F7BCA4C3596\*.pdb" /s "d:\symbol" /t "foobar2000" /v "2.24.5"
+Finding ID...  0000000001
+
+SYMSTORE: Number of files stored = 10
+SYMSTORE: Number of errors = 0
+SYMSTORE: Number of files ignored = 0
+
+#
+# 命令行选项参考
+#
+
+/r：递归搜索 PDB 文件
+/f：指定 PDB 文件路径（支持通配符 *.pdb）
+/s：Symbol Server 存储路径
+/t：产品名称（用于标识）
+/v：版本号（必需，用于匹配二进制文件）
+
