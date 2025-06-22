@@ -1,0 +1,39 @@
+
+xwlan@ntbox MINGW64 /d/cache
+$ ls prov*.txt
+providers.log.ansi.txt  providers.log.utf-16be.txt  providers.log.utf-16le.txt  providers.log.utf-8.txt  providers.log.utf-8-bom.txt
+
+xwlan@ntbox MINGW64 /d/cache
+$ ls prov*.txt | xargs -I{} hexdump -n 3 -C {}
+00000000  70 72 6f                                          |pro|
+00000003
+00000000  fe ff 00                                          |...|
+00000003
+00000000  ff fe 70                                          |..p|
+00000003
+00000000  70 72 6f                                          |pro|
+00000003
+00000000  ef bb bf                                          |...|
+00000003
+
+xwlan@ntbox MINGW64 /d/cache
+$ ls prov*.txt | xargs -I{} hexdump -n 6 -C {}
+00000000  70 72 6f 76 69 64                                 |provid|
+00000006
+00000000  fe ff 00 70 00 72                                 |...p.r|
+00000006
+00000000  ff fe 70 00 72 00                                 |..p.r.|
+00000006
+00000000  70 72 6f 76 69 64                                 |provid|
+00000006
+00000000  ef bb bf 70 72 6f                                 |...pro|
+00000006
+
+xwlan@ntbox MINGW64 /d/cache
+$ ls prov*.txt | xargs -I{} file {}
+providers.log.ansi.txt: ASCII text, with CRLF, LF line terminators
+providers.log.utf-16be.txt: Unicode text, UTF-16, big-endian text, with CRLF, LF line terminators
+providers.log.utf-16le.txt: Unicode text, UTF-16, little-endian text, with CRLF, LF line terminators
+providers.log.utf-8.txt: ASCII text, with CRLF, LF line terminators
+providers.log.utf-8-bom.txt: Unicode text, UTF-8 (with BOM) text, with CRLF, LF line terminators
+
