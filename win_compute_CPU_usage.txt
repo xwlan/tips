@@ -1,0 +1,46 @@
+#include <iostream>
+#include <windows.h>
+
+using namespace std;
+
+__int64 CompareFileTime(FILETIME time1, FILETIME time2) {
+__int64 a = time1.dwHighDateTime << 32 | time1.dwLowDateTime;
+__int64 b = time2.dwHighDateTime << 32 | time2.dwLowDateTime;
+return (b - a);
+}
+
+int main() {
+FILETIME idleTime, kernelTime, userTime;
+FILETIME pre_idleTime, pre_kernelTime, pre_userTime;
+BOOL res = GetSystemTimes(&idleTime, &kernelTime, &userTime);
+
+pre_idleTime = idleTime;
+pre_kernelTime = kernelTime;
+pre_userTime = userTime;
+
+while (true) {
+Sleep(1000);
+
+//
+// N.B. kernelTime returned by GetSystemTimes() include idle time.
+//
+
+res = GetSystemTimes(&idleTime, &kernelTime, &userTime);
+
+__int64 idle = CompareFileTime(pre_idleTime, idleTime);
+__int64 kernel = CompareFileTime(pre_kernelTime, kernelTime);
+__int64 user = CompareFileTime(pre_userTime, userTime);
+
+int cpu_occupancy_rate = (kernel + user - idle) * 100 / (kernel + user);
+int cpu_idle_rate = idle * 100 / (kernel + user);
+
+cout << "CPU占用率：" << cpu_occupancy_rate << "%" << endl;
+cout << "CPU闲置率：" << cpu_idle_rate << "%" << endl;
+
+pre_idleTime = idleTime;
+pre_kernelTime = kernelTime;
+pre_userTime = userTime;
+}
+
+return 0;
+}
